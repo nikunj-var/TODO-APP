@@ -14,9 +14,31 @@ mongoose
   })
   .then(() => console.log("Connected to DB"))
   .catch(console.error);
-const todo = require("./models/todo");
+const Todo = require("./models/todo");
+
 app.get("/todos", async (req, res) => {
-  const todos = await todo.find();
+  const todos = await Todo.find();
   res.json(todos);
+});
+
+app.post("/todo/new", (req, res) => {
+  const todo = new Todo({
+    text: req.body.text,
+  });
+  todo.save();
+  res.json(todo);
+});
+
+app.delete("/todo/delete/:id", async (req, res) => {
+  const result = await Todo.findByIdAndDelete(req.params.id);
+
+  res.json(result);
+});
+
+app.put("/todo/complete/:id", async (req, res) => {
+  const todo = await Todo.findById(req.params.id);
+  todo.complete = !todo.complete;
+  todo.save();
+  res.json(todo);
 });
 app.listen(3001, () => console.log("server started at 3001"));
